@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">RecorderAppTask</string>
+    <string name="app_name">Recorder App Task</string>
+    <string name="recorder">Recorder</string>
+    <string name="list">List</string>
 </resources>
