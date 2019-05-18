@@ -1,6 +1,8 @@
 package project.akshay.recorderapptask;
 
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,22 +15,32 @@ import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 public class RecorderFragment extends Fragment {
 
     FloatingActionButton recordButton;
     ViewGroup viewGroup;
     TextView recordingText;
     Chronometer chronometer;
+    String outputFile;
+    MediaRecorder mediaRecorder;
+    PreferenceManager preferenceManager;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView =  inflater.inflate(R.layout.fragment_recorder,container,false);
 
+        preferenceManager = new PreferenceManager(getContext());
+
         recordButton = rootView.findViewById(R.id.recordButton);
         viewGroup = rootView.findViewById(R.id.linearLayout);
         recordingText = rootView.findViewById(R.id.recordingText);
         chronometer = rootView.findViewById(R.id.chronometer);
+
+        outputFile = Environment.getExternalStorageDirectory()+"/Recordings/"+ generateRecordingName() + ".3gp";
+        setUpMediaRecorder();
 
         recordButton.setOnClickListener(new View.OnClickListener() {
 
@@ -42,15 +54,49 @@ public class RecorderFragment extends Fragment {
                 if(AppUtilities.isRecording) {
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     chronometer.start();
+
+                    try {
+                        mediaRecorder.prepare();
+                        mediaRecorder.start();
+                    } catch (IllegalStateException | IOException ise) {
+                        AppUtilities.printLogMessages("Error",ise.getMessage());
+                    }
+
                 } else {
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     chronometer.stop();
+
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                    mediaRecorder = null;
+
                 }
 
             }
         });
 
         return rootView;
+
+    }
+
+    private void setUpMediaRecorder() {
+
+        mediaRecorder = new MediaRecorder();
+        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mediaRecorder.setOutputFile(outputFile);
+
+    }
+
+    private String generateRecordingName() {
+
+        String recordingName = "recording";
+        int recordingNumber = preferenceManager.getRecordingNumber();
+
+        preferenceManager.setRecordingNumber(recordingNumber+1);
+
+        return recordingName+String.valueOf(recordingNumber);
 
     }
 }

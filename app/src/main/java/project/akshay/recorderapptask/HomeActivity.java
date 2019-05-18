@@ -1,6 +1,7 @@
 package project.akshay.recorderapptask;
 
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.Objects;
 
 import static android.Manifest.permission.RECORD_AUDIO;
@@ -61,6 +63,10 @@ public class HomeActivity extends AppCompatActivity {
                     if (permissionToRecord && permissionToStore) {
                         viewPager.setAdapter(tabAdapter);
                         tabLayout.setupWithViewPager(viewPager);
+                        File folder = new File(Environment.getExternalStorageDirectory()+File.separator+"Recordings");
+                        if(!folder.exists()) {
+                            folder.mkdir();
+                        }
                     } else {
                         Snackbar.make(linearLayout,"Provide permissions to record audio",Snackbar.LENGTH_SHORT).show();
                     }
