@@ -43,18 +43,33 @@ public class ListFragment extends Fragment {
         relativeLayout = rootView.findViewById(R.id.relativeLayout);
 
         path = Environment.getExternalStorageDirectory()+"/Recordings";
+
         File directory = new File(path);
-        File[] files = directory.listFiles();
+        if(!directory.exists()){
+            directory.mkdir();
+        } else {
+
+            File[] files = directory.listFiles();
+
+            try {
+                if(files.length != 0){
+
+                    for (File file : files) {
+                        recording = new Recording(file.getName(), file.getAbsolutePath());
+                        AppUtilities.recordingsList.add(recording);
+                    }
+
+                }
+            } catch (Exception e) {
+                AppUtilities.printLogMessages("ERROR",e.getMessage());
+            }
+
+        }
 
         recordingsListView = rootView.findViewById(R.id.recordingsListView);
         manager = new LinearLayoutManager(getContext());
 
         AppUtilities.recordingsList.clear();
-
-        for (File file : files) {
-            recording = new Recording(file.getName(), file.getAbsolutePath());
-            AppUtilities.recordingsList.add(recording);
-        }
 
         adapter = new RecordingsAdapter(AppUtilities.recordingsList);
         mediaPlayer = new MediaPlayer();
