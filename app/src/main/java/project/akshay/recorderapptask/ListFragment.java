@@ -43,33 +43,26 @@ public class ListFragment extends Fragment {
         relativeLayout = rootView.findViewById(R.id.relativeLayout);
 
         path = Environment.getExternalStorageDirectory()+"/Recordings";
+        AppUtilities.recordingsList.clear();
 
         File directory = new File(path);
-        if(!directory.exists()){
-            directory.mkdir();
-        } else {
+        if(directory.exists()){
 
             File[] files = directory.listFiles();
 
-            try {
-                if(files.length != 0){
-
-                    for (File file : files) {
-                        recording = new Recording(file.getName(), file.getAbsolutePath());
-                        AppUtilities.recordingsList.add(recording);
-                    }
-
-                }
-            } catch (Exception e) {
-                AppUtilities.printLogMessages("ERROR",e.getMessage());
+            for (File file : files) {
+                recording = new Recording(file.getName(), file.getAbsolutePath());
+                AppUtilities.recordingsList.add(recording);
             }
+
+        } else {
+
+            directory.mkdir();
 
         }
 
         recordingsListView = rootView.findViewById(R.id.recordingsListView);
         manager = new LinearLayoutManager(getContext());
-
-        AppUtilities.recordingsList.clear();
 
         adapter = new RecordingsAdapter(AppUtilities.recordingsList);
         mediaPlayer = new MediaPlayer();
@@ -100,7 +93,9 @@ public class ListFragment extends Fragment {
 
                         try {
                             previousTextView.setVisibility(View.GONE);
-                            AppUtilities.isPlaying = !AppUtilities.isPlaying;
+                            if(AppUtilities.isPlaying){
+                                AppUtilities.isPlaying = !AppUtilities.isPlaying;
+                            }
                         } catch (Exception e){
                             AppUtilities.printLogMessages("ERROR",e.getMessage());
                         }
