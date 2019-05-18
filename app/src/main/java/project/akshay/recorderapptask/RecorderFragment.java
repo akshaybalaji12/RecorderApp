@@ -26,6 +26,7 @@ public class RecorderFragment extends Fragment {
     String outputFile;
     MediaRecorder mediaRecorder;
     PreferenceManager preferenceManager;
+    String recordingName;
 
     @Nullable
     @Override
@@ -39,7 +40,6 @@ public class RecorderFragment extends Fragment {
         recordingText = rootView.findViewById(R.id.recordingText);
         chronometer = rootView.findViewById(R.id.chronometer);
 
-        outputFile = Environment.getExternalStorageDirectory()+"/Recordings/"+ generateRecordingName() + ".3gp";
         setUpMediaRecorder();
 
         recordButton.setOnClickListener(new View.OnClickListener() {
@@ -66,9 +66,13 @@ public class RecorderFragment extends Fragment {
                     chronometer.setBase(SystemClock.elapsedRealtime());
                     chronometer.stop();
 
+                    Recording recording = new Recording(recordingName,outputFile);
+                    AppUtilities.recordingsList.add(recording);
+                    ListFragment.adapter.notifyDataSetChanged();
+
                     mediaRecorder.stop();
                     mediaRecorder.release();
-                    mediaRecorder = null;
+                    setUpMediaRecorder();
 
                 }
 
@@ -80,6 +84,9 @@ public class RecorderFragment extends Fragment {
     }
 
     private void setUpMediaRecorder() {
+
+        recordingName = generateRecordingName();
+        outputFile = Environment.getExternalStorageDirectory()+"/Recordings/"+ recordingName;
 
         mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -96,7 +103,7 @@ public class RecorderFragment extends Fragment {
 
         preferenceManager.setRecordingNumber(recordingNumber+1);
 
-        return recordingName+String.valueOf(recordingNumber);
+        return recordingName+String.valueOf(recordingNumber)+".3gp";
 
     }
 }

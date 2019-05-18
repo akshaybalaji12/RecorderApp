@@ -6,10 +6,12 @@ import android.util.Log;
 import android.view.View;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 public class AppUtilities {
 
     public static boolean isRecording = false;
+    public static boolean isPlaying = false;
 
     public static void setDefaultFont(Context context,
                                       String staticTypefaceFieldName, String fontAssetName) {
@@ -34,5 +36,6 @@ public class AppUtilities {
         Log.d(tag,message);
     }
 
+    public static ArrayList<Recording> recordingsList = new ArrayList<>();
 
 }

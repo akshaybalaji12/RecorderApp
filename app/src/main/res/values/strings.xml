@@ -3,4 +3,5 @@
     <string name="recorder">Recorder</string>
     <string name="list">List</string>
     <string name="recording">Recording</string>
+    <string name="playing">Playing</string>
 </resources>
