@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 
 public class AppUtilities {
 
+    public static boolean isRecording = false;
+
     public static void setDefaultFont(Context context,
                                       String staticTypefaceFieldName, String fontAssetName) {
         final Typeface regular = Typeface.createFromAsset(context.getAssets(),

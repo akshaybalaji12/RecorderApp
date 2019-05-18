@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity {
                 break;
         }
     }
-    
+
     public boolean checkPermissions() {
         int result = ContextCompat.checkSelfPermission(getApplicationContext(), WRITE_EXTERNAL_STORAGE);
         int result1 = ContextCompat.checkSelfPermission(getApplicationContext(), RECORD_AUDIO);
