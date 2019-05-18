@@ -4,4 +4,7 @@
     <string name="list">List</string>
     <string name="recording">Recording</string>
     <string name="playing">Playing</string>
+    <string name="instructions">Press on the recording to play or pause</string>
+    <string name="errorPlaying">Can\'t play while recording</string>
+    <string name="errorRecording">Can\'t record while playing</string>
 </resources>

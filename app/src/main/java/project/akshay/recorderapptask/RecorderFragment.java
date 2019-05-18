@@ -7,12 +7,14 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -27,14 +29,16 @@ public class RecorderFragment extends Fragment {
     MediaRecorder mediaRecorder;
     PreferenceManager preferenceManager;
     String recordingName;
+    RelativeLayout relativeLayout;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView =  inflater.inflate(R.layout.fragment_recorder,container,false);
+        final View rootView =  inflater.inflate(R.layout.fragment_recorder,container,false);
 
         preferenceManager = new PreferenceManager(getContext());
 
+        relativeLayout = rootView.findViewById(R.id.relativeLayout);
         recordButton = rootView.findViewById(R.id.recordButton);
         viewGroup = rootView.findViewById(R.id.linearLayout);
         recordingText = rootView.findViewById(R.id.recordingText);
@@ -47,33 +51,39 @@ public class RecorderFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                TransitionManager.beginDelayedTransition(viewGroup);
-                AppUtilities.isRecording = !AppUtilities.isRecording;
-                recordingText.setVisibility(AppUtilities.isRecording ? View.VISIBLE : View.GONE);
+                if(!AppUtilities.isPlaying){
 
-                if(AppUtilities.isRecording) {
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    chronometer.start();
+                    TransitionManager.beginDelayedTransition(viewGroup);
+                    AppUtilities.isRecording = !AppUtilities.isRecording;
+                    recordingText.setVisibility(AppUtilities.isRecording ? View.VISIBLE : View.GONE);
 
-                    try {
-                        mediaRecorder.prepare();
-                        mediaRecorder.start();
-                    } catch (IllegalStateException | IOException ise) {
-                        AppUtilities.printLogMessages("Error",ise.getMessage());
+                    if(AppUtilities.isRecording) {
+                        chronometer.setBase(SystemClock.elapsedRealtime());
+                        chronometer.start();
+
+                        try {
+                            mediaRecorder.prepare();
+                            mediaRecorder.start();
+                        } catch (IllegalStateException | IOException ise) {
+                            AppUtilities.printLogMessages("Error",ise.getMessage());
+                        }
+
+                    } else {
+                        chronometer.setBase(SystemClock.elapsedRealtime());
+                        chronometer.stop();
+
+                        Recording recording = new Recording(recordingName,outputFile);
+                        AppUtilities.recordingsList.add(recording);
+                        ListFragment.adapter.notifyDataSetChanged();
+
+                        mediaRecorder.stop();
+                        mediaRecorder.release();
+                        setUpMediaRecorder();
+
                     }
 
                 } else {
-                    chronometer.setBase(SystemClock.elapsedRealtime());
-                    chronometer.stop();
-
-                    Recording recording = new Recording(recordingName,outputFile);
-                    AppUtilities.recordingsList.add(recording);
-                    ListFragment.adapter.notifyDataSetChanged();
-
-                    mediaRecorder.stop();
-                    mediaRecorder.release();
-                    setUpMediaRecorder();
-
+                    Snackbar.make(relativeLayout,rootView.getResources().getString(R.string.errorRecording),Snackbar.LENGTH_SHORT).show();
                 }
 
             }
